@@ -7,6 +7,9 @@ GAMECPU=$(uname -m)
 if [ "${GAMECPU}" = "aarch64" ]; then
 	GAMECPU=arm64
 fi
+if [ "${GAMECPU}" = "armv7l" ] || [ "${GAMECPU}" = "armv8l" ]; then
+	GAMECPU=arm
+fi
 if [ "${GAMECPU}" = "i686" ]; then
 	GAMECPU=i386
 fi
