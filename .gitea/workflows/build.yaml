@@ -64,7 +64,7 @@ jobs:
           pull: true
           push: true
           file: Dockerfile
-          tags: code.nephatrine.net/nephnet/quake2-q2pro:8.51-${{matrix.nephhub}}
+          tags: code.nephatrine.net/nephnet/quake2-q2pro:${{matrix.nephhub}}
           cache-from: type=registry,ref=code.nephatrine.net/nephhub/${{matrix.nephhub}}-cache:quake2-q2pro
           cache-to: type=registry,image-manifest=true,oci-mediatypes=true,ref=code.nephatrine.net/nephhub/${{matrix.nephhub}}-cache:quake2-q2pro,mode=max
       - name: Notify Discord
@@ -114,14 +114,14 @@ jobs:
           password: ${{ secrets.DOCKER_PASS }}
       - name: Tag & Push
         run: |
-          docker pull code.nephatrine.net/nephnet/quake2-q2pro:8.51-${{matrix.nephhub}} --platform linux/${{matrix.platform}}
-          docker tag code.nephatrine.net/nephnet/quake2-q2pro:8.51-${{matrix.nephhub}} nephatrine/${{matrix.dockerhub}}:quake2-q2pro-8.51
-          docker rmi code.nephatrine.net/nephnet/quake2-q2pro:8.51-${{matrix.nephhub}}
-          docker push nephatrine/${{matrix.dockerhub}}:quake2-q2pro-8.51
-          docker rmi nephatrine/${{matrix.dockerhub}}:quake2-q2pro-8.51
+          docker pull code.nephatrine.net/nephnet/quake2-q2pro:${{matrix.nephhub}} --platform linux/${{matrix.platform}}
+          docker tag code.nephatrine.net/nephnet/quake2-q2pro:${{matrix.nephhub}} nephatrine/${{matrix.dockerhub}}:quake2-q2pro
+          docker rmi code.nephatrine.net/nephnet/quake2-q2pro:${{matrix.nephhub}}
+          docker push nephatrine/${{matrix.dockerhub}}:quake2-q2pro
+          docker rmi nephatrine/${{matrix.dockerhub}}:quake2-q2pro
       - name: Clean Up
         if: failure()
-        run: docker rmi nephatrine/${{matrix.dockerhub}}:quake2-q2pro-8.51
+        run: docker rmi nephatrine/${{matrix.dockerhub}}:quake2-q2pro
       - name: Notify Discord
         uses: https://code.nephatrine.net/NephHub/actions-status-discord@v1
         if: failure()
@@ -155,16 +155,16 @@ jobs:
         continue-on-error: true
         id: manifest
         run: |
-          export IMAGELIST="--amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-amd64 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-ia32 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-arm64 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-arm32 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-riscv64"
-          for manifestName in 8.51 8 latest; do docker manifest rm code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} || true; docker manifest create code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge code.nephatrine.net/nephnet/quake2-q2pro:${manifestName}; done
+          export IMAGELIST="--amend code.nephatrine.net/nephnet/quake2-q2pro:amd64 --amend code.nephatrine.net/nephnet/quake2-q2pro:ia32 --amend code.nephatrine.net/nephnet/quake2-q2pro:arm64 --amend code.nephatrine.net/nephnet/quake2-q2pro:arm32 --amend code.nephatrine.net/nephnet/quake2-q2pro:riscv64"
+          for manifestName in latest; do docker manifest rm code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} || true; docker manifest create code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge code.nephatrine.net/nephnet/quake2-q2pro:${manifestName}; done
       - name: Wait to Retry
         if: steps.manifest.outcome != 'success'
         run: sleep 60
       - name: Retry Docker Manifest
         if: steps.manifest.outcome != 'success'
         run: |
-          export IMAGELIST="--amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-amd64 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-ia32 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-arm64 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-arm32 --amend code.nephatrine.net/nephnet/quake2-q2pro:8.51-riscv64"
-          for manifestName in 8.51 8 latest; do docker manifest rm code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} || true; docker manifest create code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge code.nephatrine.net/nephnet/quake2-q2pro:${manifestName}; done
+          export IMAGELIST="--amend code.nephatrine.net/nephnet/quake2-q2pro:amd64 --amend code.nephatrine.net/nephnet/quake2-q2pro:ia32 --amend code.nephatrine.net/nephnet/quake2-q2pro:arm64 --amend code.nephatrine.net/nephnet/quake2-q2pro:arm32 --amend code.nephatrine.net/nephnet/quake2-q2pro:riscv64"
+          for manifestName in latest; do docker manifest rm code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} || true; docker manifest create code.nephatrine.net/nephnet/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge code.nephatrine.net/nephnet/quake2-q2pro:${manifestName}; done
       - name: Notify Discord
         uses: https://code.nephatrine.net/NephHub/actions-status-discord@v1
         if: failure()
@@ -196,16 +196,16 @@ jobs:
         continue-on-error: true
         id: manifest
         run: |
-          export IMAGELIST="--amend nephatrine/amd64:quake2-q2pro-8.51 --amend nephatrine/ia32:quake2-q2pro-8.51 --amend nephatrine/arm64:quake2-q2pro-8.51 --amend nephatrine/armv7:quake2-q2pro-8.51 --amend nephatrine/riscv64:quake2-q2pro-8.51"
-          for manifestName in 8.51 8 latest; do docker manifest rm nephatrine/quake2-q2pro:${manifestName} || true; docker manifest create nephatrine/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge nephatrine/quake2-q2pro:${manifestName}; done
+          export IMAGELIST="--amend nephatrine/amd64:quake2-q2pro --amend nephatrine/ia32:quake2-q2pro --amend nephatrine/arm64:quake2-q2pro --amend nephatrine/armv7:quake2-q2pro --amend nephatrine/riscv64:quake2-q2pro"
+          for manifestName in latest; do docker manifest rm nephatrine/quake2-q2pro:${manifestName} || true; docker manifest create nephatrine/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge nephatrine/quake2-q2pro:${manifestName}; done
       - name: Wait to Retry
         if: steps.manifest.outcome != 'success'
         run: sleep 60
       - name: Retry Docker Manifest
         if: steps.manifest.outcome != 'success'
         run: |
-          export IMAGELIST="--amend nephatrine/amd64:quake2-q2pro-8.51 --amend nephatrine/ia32:quake2-q2pro-8.51 --amend nephatrine/arm64:quake2-q2pro-8.51 --amend nephatrine/armv7:quake2-q2pro-8.51 --amend nephatrine/riscv64:quake2-q2pro-8.51"
-          for manifestName in 8.51 8 latest; do docker manifest rm nephatrine/quake2-q2pro:${manifestName} || true; docker manifest create nephatrine/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge nephatrine/quake2-q2pro:${manifestName}; done
+          export IMAGELIST="--amend nephatrine/amd64:quake2-q2pro --amend nephatrine/ia32:quake2-q2pro --amend nephatrine/arm64:quake2-q2pro --amend nephatrine/armv7:quake2-q2pro --amend nephatrine/riscv64:quake2-q2pro"
+          for manifestName in latest; do docker manifest rm nephatrine/quake2-q2pro:${manifestName} || true; docker manifest create nephatrine/quake2-q2pro:${manifestName} ${IMAGELIST}; docker manifest push --purge nephatrine/quake2-q2pro:${manifestName}; done
       - name: Notify Discord
         uses: https://code.nephatrine.net/NephHub/actions-status-discord@v1
         if: failure()
