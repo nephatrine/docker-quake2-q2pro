@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2025 Daniel Wolf <nephatrine@gmail.com>
+# SPDX-License-Identifier: CC0-1.0
+
+services:
+  quake2-q2pro:
+    build: .
+    container_name: quake2-q2pro
+    environment:
+      TZ: America/New_York
+      PUID: 1000
+      PGID: 1000
+    ports:
+      - "27910:27910/udp"
+    volumes:
+      - /mnt/containers/quake2-q2pro:/mnt/config

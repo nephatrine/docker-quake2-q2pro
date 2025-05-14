@@ -1,0 +1,76 @@
+#!/command/with-contenv /bin/bash
+# SPDX-FileCopyrightText: 2025 Daniel Wolf <nephatrine@gmail.com>
+# SPDX-License-Identifier: ISC
+
+# shellcheck shell=bash
+# shellcheck disable=SC2002,SC2086
+
+export HOME=/mnt/config/home
+export GAME_START=${GAME_START:-"+exec server.cfg"}
+
+if [ -z "${QUAKE2_DATA}" ]; then
+  if [ -n "${QUAKE2_INSTALL}" ] && [ ! "${QUAKE2_INSTALL}" = "true" ] && [ ! "${QUAKE2_INSTALL}" = "false" ]; then
+    export QUAKE2_DATA="${QUAKE2_INSTALL}"
+  else
+    export QUAKE2_DATA="/mnt/config/data/quake2"
+  fi
+fi
+
+if [[ ! -d "${QUAKE2_DATA}/openffa/highscores" && -d /mnt/config/home/.q2pro/openffa/highscores ]]; then
+  /command/s6-setuidgid guardian /bin/mkdir -p "${QUAKE2_DATA}/openffa/highscores"
+  if [[ -d "${QUAKE2_DATA}/openffa/highscores" ]]; then
+    /command/s6-setuidgid guardian /bin/cp -Rv /mnt/config/home/.q2pro/openffa/highscores/. "${QUAKE2_DATA}/openffa/highscores/"
+    /bin/rm -rf /mnt/config/home/.q2pro/openffa/highscores
+  fi
+fi
+if [[ ! -d "${QUAKE2_DATA}/openffa/mapcfg" && -d /mnt/config/home/.q2pro/openffa/mapcfg ]]; then
+  /command/s6-setuidgid guardian /bin/mkdir -p "${QUAKE2_DATA}/openffa/mapcfg"
+  if [[ -d "${QUAKE2_DATA}/openffa/mapcfg" ]]; then
+    /command/s6-setuidgid guardian /bin/cp -Rv /mnt/config/home/.q2pro/openffa/mapcfg/. "${QUAKE2_DATA}/openffa/mapcfg/"
+    /bin/rm -rf /mnt/config/home/.q2pro/openffa/mapcfg
+  fi
+fi
+if [[ ! -d "${QUAKE2_DATA}/openffa/motd" && -d /mnt/config/home/.q2pro/openffa/motd ]]; then
+  /command/s6-setuidgid guardian /bin/mkdir -p "${QUAKE2_DATA}/openffa/motd"
+  if [[ -d "${QUAKE2_DATA}/openffa/motd" ]]; then
+    /command/s6-setuidgid guardian /bin/cp -Rv /mnt/config/home/.q2pro/openffa/motd/. "${QUAKE2_DATA}/openffa/motd/"
+    /bin/rm -rf /mnt/config/home/.q2pro/openffa/motd
+  fi
+fi
+if [[ -d "${QUAKE2_DATA}/openffa" ]]; then
+  /bin/chown guardian:users /mnt/config/home/.q2pro/openffa
+  if [[ ! -d "${QUAKE2_DATA}/openffa/highscores" ]]; then
+    /command/s6-setuidgid guardian /bin/mkdir -p "${QUAKE2_DATA}/openffa/highscores"
+  fi
+  if [[ -d "${QUAKE2_DATA}/openffa/highscores" ]]; then
+    if [[ -e /mnt/config/home/.q2pro/openffa/highscores ]]; then
+      /bin/rm -f /mnt/config/home/.q2pro/openffa/highscores
+    fi
+    /command/s6-setuidgid guardian /bin/ln -s "${QUAKE2_DATA}/openffa/highscores" /mnt/config/home/.q2pro/openffa/highscores
+  fi
+  if [[ ! -d "${QUAKE2_DATA}/openffa/mapcfg" ]]; then
+    /command/s6-setuidgid guardian /bin/mkdir -p "${QUAKE2_DATA}/openffa/mapcfg"
+  fi
+  if [[ -d "${QUAKE2_DATA}/openffa/mapcfg" ]]; then
+    if [[ -e /mnt/config/home/.q2pro/openffa/mapcfg ]]; then
+      /bin/rm -f /mnt/config/home/.q2pro/openffa/mapcfg
+    fi
+    /command/s6-setuidgid guardian /bin/ln -s "${QUAKE2_DATA}/openffa/mapcfg" /mnt/config/home/.q2pro/openffa/mapcfg
+  fi
+  if [[ ! -d "${QUAKE2_DATA}/openffa/motd" ]]; then
+    /command/s6-setuidgid guardian /bin/mkdir -p "${QUAKE2_DATA}/openffa/motd"
+  fi
+  if [[ -d "${QUAKE2_DATA}/openffa/motd" ]]; then
+    if [[ -e /mnt/config/home/.q2pro/openffa/motd ]]; then
+      /bin/rm -f /mnt/config/home/.q2pro/openffa/motd
+    fi
+    /command/s6-setuidgid guardian /bin/ln -s "${QUAKE2_DATA}/openffa/motd" /mnt/config/home/.q2pro/openffa/motd
+  fi
+fi
+
+cd /opt/quake2 || exit 1
+/command/s6-setuidgid guardian /usr/bin/tmux new-session -d -s quakedock bin/q2proded +set sys_console 2 ${GAME_START}
+/bin/sleep 2
+while /command/s6-setuidgid guardian /usr/bin/tmux list-sessions | /bin/grep quakedock >/dev/null; do
+  /bin/sleep 30
+done
