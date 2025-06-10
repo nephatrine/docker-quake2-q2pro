@@ -1,8 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Daniel Wolf <nephatrine@gmail.com>
 # SPDX-License-Identifier: ISC
 
-# hadolint global ignore=DL3007,DL3018
+# hadolint global ignore=DL3018
 
+# hadolint ignore=DL3007
 FROM code.nephatrine.net/nephnet/nxb-alpine:latest AS builder
 
 RUN git -C /root clone --single-branch --depth=1 https://github.com/skullernet/q2pro.git
@@ -72,6 +73,7 @@ RUN make -j$(( $(getconf _NPROCESSORS_ONLN) / 2 + 1 )) \
   && mkdir release \
   && mv game*.so "release/$(quake2-gamename)"
 
+# hadolint ignore=DL3007
 FROM code.nephatrine.net/nephnet/alpine-s6:latest
 LABEL maintainer="Daniel Wolf <nephatrine@gmail.com>"
 
