@@ -21,13 +21,13 @@ WORKDIR /root/ctf
 RUN make -j$(( $(getconf _NPROCESSORS_ONLN) / 2 + 1 )) \
   && mv release/game.so "release/$(quake2-gamename)"
 
-ARG XATRIX_VERSION=XATRIX_2_15
+ARG XATRIX_VERSION=XATRIX_2_16
 RUN git -C /root clone -b "$XATRIX_VERSION" --single-branch --depth=1 https://github.com/yquake2/xatrix.git
 WORKDIR /root/xatrix
 RUN make -j$(( $(getconf _NPROCESSORS_ONLN) / 2 + 1 )) \
   && mv release/game.so "release/$(quake2-gamename)"
 
-ARG ROGUE_VERSION=ROGUE_2_14
+ARG ROGUE_VERSION=ROGUE_2_15
 RUN git -C /root clone -b "$ROGUE_VERSION" --single-branch --depth=1 https://github.com/yquake2/rogue.git
 WORKDIR /root/rogue
 RUN make -j$(( $(getconf _NPROCESSORS_ONLN) / 2 + 1 )) \
