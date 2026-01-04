@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 Daniel Wolf <nephatrine@gmail.com>
+# SPDX-FileCopyrightText: 2025-2026 Daniel Wolf <nephatrine@gmail.com>
 # SPDX-License-Identifier: ISC
 
 # hadolint global ignore=DL3018
@@ -6,7 +6,7 @@
 # hadolint ignore=DL3007
 FROM code.nephatrine.net/nephnet/nxb-alpine:latest AS builder
 
-RUN git -C /root clone --single-branch --depth=1 https://github.com/skullernet/q2pro.git
+RUN git -C /root clone --single-branch --depth=1 https://code.nephatrine.net/QuakeArchive/q2pro.git
 WORKDIR /root/q2pro
 RUN meson setup /tmp/q2pro/build \
   && meson configure -Dprefix=/opt/quake2 /tmp/q2pro/build \
@@ -56,7 +56,7 @@ RUN make -j$(( $(getconf _NPROCESSORS_ONLN) / 2 + 1 )) \
   && mkdir release \
   && mv game*.so "release/$(quake2-gamename)"
 
-RUN git -C /root clone --single-branch --depth=1 https://github.com/skullernet/openffa.git
+RUN git -C /root clone --single-branch --depth=1 https://code.nephatrine.net/QuakeArchive/openffa.git
 WORKDIR /root/openffa
 RUN make -j$(( $(getconf _NPROCESSORS_ONLN) / 2 + 1 )) \
   && mkdir release \
